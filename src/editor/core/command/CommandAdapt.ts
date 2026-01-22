@@ -1282,6 +1282,18 @@ export class CommandAdapt {
         return base64List
     }
 
+    public async getPageBlob(): Promise<Blob[]> {
+        const { scale, printPixelRatio } = this.options
+        if (scale !== 1) {
+            this.draw.setPageScale(1)
+        }
+        const blobList: Blob[] = await this.draw.getPageBlob({ pixelRatio: printPixelRatio, mode: EditorMode.PRINT })
+        if (scale !== 1) {
+            this.draw.setPageScale(scale)
+        }
+        return blobList
+    }
+
     public replaceImageElement(payload: string) {
         const { startIndex } = this.range.getRange()
         const elementList = this.draw.getElementList()

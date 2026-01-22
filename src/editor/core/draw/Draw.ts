@@ -921,6 +921,48 @@ export class Draw {
         return this.getRowList().length
     }
 
+    public async getPageBlob(payload: IGetImageOption = {}): Promise<Blob[]> {
+        const { pixelRatio, mode } = payload
+        // 放大像素比
+        if (pixelRatio) {
+            this.setPagePixelRatio(pixelRatio)
+        }
+        // 不同模式
+        const currentMode = this.mode
+        const isSwitchMode = !!mode && currentMode !== mode
+        if (isSwitchMode) {
+            this.setMode(mode)
+        }
+        this.render({
+            isLazy: false,
+            isCompute: false,
+            isSetCursor: false,
+            isSubmitHistory: false
+        })
+        await this.imageObserver.allSettled()
+
+        const blobList: Promise<Blob>[] = this.pageList.map(async c => {
+            const { promise, resolve, reject } = Promise.withResolvers<Blob>()
+            c.toBlob((blob) => {
+                if (blob != null) {
+                    resolve(blob)
+                } else {
+                    reject(new Error('转换Blob失败'))
+                }
+            }, 'image/jpeg', 0.8)
+            return await promise
+        })
+        const result: Blob[] = await Promise.all(blobList)
+        // 还原
+        if (pixelRatio) {
+            this.setPagePixelRatio(null)
+        }
+        if (isSwitchMode) {
+            this.setMode(currentMode)
+        }
+        return result
+    }
+
     public async getDataURL(payload: IGetImageOption = {}): Promise<string[]> {
         const { pixelRatio, mode } = payload
         // 放大像素比

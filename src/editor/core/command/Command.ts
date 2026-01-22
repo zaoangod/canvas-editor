@@ -141,6 +141,7 @@ export class Command {
     public getPositionContextByEvent: CommandAdapt['getPositionContextByEvent']
     public getElementById: CommandAdapt['getElementById']
     public getPrintData: CommandAdapt['getPrintData']
+    public getPageBlob: CommandAdapt['getPageBlob']
 
     constructor(adapt: CommandAdapt) {
         // 全局命令
@@ -284,6 +285,7 @@ export class Command {
         this.getPositionContextByEvent = adapt.getPositionContextByEvent.bind(adapt)
         this.getElementById = adapt.getElementById.bind(adapt)
         this.getPrintData = adapt.getPrintData.bind(adapt)
+        this.getPageBlob = adapt.getPageBlob.bind(adapt)
         // 控件
         this.executeSetControlValue = adapt.setControlValue.bind(adapt)
         this.executeSetControlValueList = adapt.setControlValueList.bind(adapt)
